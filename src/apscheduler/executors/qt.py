@@ -41,29 +41,13 @@ class QtJobExecutor(JobExecutor):
         self._signals.run_job.connect(self.run_in_qt_thread)
 
     async def start(self, exit_stack: AsyncExitStack) -> None:
-        self._portal = await exit_stack.enter_async_context(BlockingPortal())
+        pass
 
     async def run_job(self, func: Callable[..., T_Retval], job: Job) -> Any:
-        future: Future[T_Retval] = Future()
-        event = anyio.Event()
-        self._signals.run_job.emit((func, job, future, event))
-        await event.wait()
-        return future.result(0)
+        pass
 
     def run_in_qt_thread(
         self,
         parameters: tuple[Callable[..., T_Retval], Job, Future[T_Retval], anyio.Event],
     ) -> Any:
-        func, job, future, event = parameters
-        token = current_job.set(job)
-        try:
-            retval = func(*job.args, **job.kwargs)
-        except BaseException as exc:
-            future.set_exception(exc)
-            if not isinstance(exc, Exception):
-                raise
-        else:
-            future.set_result(retval)
-        finally:
-            current_job.reset(token)
-            self._portal.call(event.set)
+        pass

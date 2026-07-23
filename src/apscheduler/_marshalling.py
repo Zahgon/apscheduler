@@ -11,36 +11,19 @@ from ._exceptions import DeserializationError, SerializationError
 
 
 def marshal_object(obj) -> tuple[str, Any]:
-    return (
-        f"{obj.__class__.__module__}:{obj.__class__.__qualname__}",
-        obj.__getstate__(),
-    )
+    pass
 
 
 def unmarshal_object(ref: str, state: Any) -> Any:
-    cls = callable_from_ref(ref)
-    if not isinstance(cls, type):
-        raise TypeError(f"{ref} is not a class")
-
-    instance = cls.__new__(cls)
-    instance.__setstate__(state)
-    return instance
+    pass
 
 
 def marshal_timezone(value: tzinfo) -> str:
-    if isinstance(value, ZoneInfo):
-        return value.key
-    elif hasattr(value, "zone"):  # pytz timezones
-        return value.zone
-
-    raise SerializationError(
-        f"Unserializable time zone: {value!r}\n"
-        f"Only time zones from the zoneinfo or pytz modules can be serialized."
-    )
+    pass
 
 
 def unmarshal_timezone(value: str) -> ZoneInfo:
-    return ZoneInfo(value)
+    pass
 
 
 def callable_to_ref(func: Callable) -> str:

@@ -1,4 +1,3 @@
-"""This module contains the expressions applicable for CronTrigger's fields."""
 
 from __future__ import annotations
 
@@ -35,10 +34,7 @@ MONTHS = [
 
 
 def get_weekday_index(weekday: str) -> int:
-    try:
-        return WEEKDAYS.index(weekday.lower())
-    except ValueError:
-        raise ValueError(f"Invalid weekday name {weekday!r}") from None
+    pass
 
 
 @attrs.define(slots=True)
@@ -52,26 +48,10 @@ class AllExpression:
     )
 
     def validate_range(self, field_name: str, min_value: int, max_value: int) -> None:
-        value_range = max_value - min_value
-        if self.step and self.step > value_range:
-            raise ValueError(
-                f"the step value ({self.step}) is higher than the total range of the "
-                f"expression ({value_range})"
-            )
+        pass
 
     def get_next_value(self, dateval: datetime, field: BaseField) -> int | None:
-        start = field.get_value(dateval)
-        minval = field.get_min(dateval)
-        maxval = field.get_max(dateval)
-        start = max(start, minval)
-
-        if not self.step:
-            nextval = start
-        else:
-            distance_to_next = (self.step - (start - minval)) % self.step
-            nextval = start + distance_to_next
-
-        return nextval if nextval <= maxval else None
+        pass
 
     def __str__(self) -> str:
         return f"*/{self.step}" if self.step else "*"
@@ -102,40 +82,10 @@ class RangeExpression(AllExpression):
             )
 
     def validate_range(self, field_name: str, min_value: int, max_value: int) -> None:
-        super().validate_range(field_name, min_value, max_value)
-        if self.first < min_value:
-            raise ValueError(
-                f"the first value ({self.first}) is lower than the minimum value "
-                f"({min_value})"
-            )
-        if self.last is not None and self.last > max_value:
-            raise ValueError(
-                f"the last value ({self.last}) is higher than the maximum value "
-                f"({max_value})"
-            )
-        value_range = (self.last or max_value) - self.first
-        if self.step and self.step > value_range:
-            raise ValueError(
-                f"the step value ({self.step}) is higher than the total range of the "
-                f"expression ({value_range})"
-            )
+        pass
 
     def get_next_value(self, dateval: datetime, field: BaseField) -> int | None:
-        startval = field.get_value(dateval)
-        minval = field.get_min(dateval)
-        maxval = field.get_max(dateval)
-
-        # Apply range limits
-        minval = max(minval, self.first)
-        maxval = min(maxval, self.last) if self.last is not None else maxval
-        nextval = max(minval, startval)
-
-        # Apply the step if defined
-        if self.step:
-            distance_to_next = (self.step - (nextval - minval)) % self.step
-            nextval += distance_to_next
-
-        return nextval if nextval <= maxval else None
+        pass
 
     def __str__(self) -> str:
         if self.last != self.first and self.last is not None:
@@ -216,25 +166,7 @@ class WeekdayPositionExpression(AllExpression):
         self.__attrs_init__(option_num=option_num, weekday=weekday)
 
     def get_next_value(self, dateval: datetime, field: BaseField) -> int | None:
-        # Figure out the weekday of the month's first day and the number of days in that
-        # month
-        first_day_wday, last_day = monthrange(dateval.year, dateval.month)
-
-        # Calculate which day of the month is the first of the target weekdays
-        first_hit_day = self.weekday - first_day_wday + 1
-        if first_hit_day <= 0:
-            first_hit_day += 7
-
-        # Calculate what day of the month the target weekday would be
-        if self.option_num < 5:
-            target_day = first_hit_day + self.option_num * 7
-        else:
-            target_day = first_hit_day + ((last_day - first_hit_day) // 7) * 7
-
-        if last_day >= target_day >= dateval.day:
-            return target_day
-        else:
-            return None
+        pass
 
     def __str__(self) -> str:
         return f"{self.options[self.option_num]} {WEEKDAYS[self.weekday]}"
@@ -247,7 +179,7 @@ class LastDayOfMonthExpression(AllExpression):
         super().__init__(None)
 
     def get_next_value(self, dateval: datetime, field: BaseField) -> int | None:
-        return monthrange(dateval.year, dateval.month)[1]
+        pass
 
     def __str__(self) -> str:
         return "last"

@@ -58,29 +58,10 @@ def task(
     """
 
     def wrapper(func: T) -> T:
-        if not isinstance(func, Callable):
-            raise ValueError("only functions can be decorated with @task")
-
-        if hasattr(func, TASK_PARAMETERS_KEY):
-            raise ValueError(
-                "this function already has APScheduler task parameters set"
-            )
-
-        setattr(
-            func,
-            TASK_PARAMETERS_KEY,
-            TaskParameters(
-                id=id,
-                job_executor=job_executor,
-                max_running_jobs=max_running_jobs,
-                misfire_grace_time=misfire_grace_time,
-                metadata=metadata,
-            ),
-        )
-        return func
+        pass
 
     return wrapper
 
 
 def get_task_params(func: Callable[..., Any]) -> TaskParameters:
-    return getattr(func, TASK_PARAMETERS_KEY, None) or TaskParameters()
+    pass

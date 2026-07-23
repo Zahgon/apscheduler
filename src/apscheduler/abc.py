@@ -21,9 +21,6 @@ if TYPE_CHECKING:
 
 
 class Trigger(Iterator[datetime], metaclass=ABCMeta):
-    """
-    Abstract base class that defines the interface that every trigger must implement.
-    """
 
     __slots__ = ()
 
@@ -59,7 +56,6 @@ class Trigger(Iterator[datetime], metaclass=ABCMeta):
 
 
 class Serializer(metaclass=ABCMeta):
-    """Interface for classes that implement (de)serialization."""
 
     __slots__ = ()
 
@@ -88,11 +84,6 @@ class Serializer(metaclass=ABCMeta):
 
 
 class Subscription(metaclass=ABCMeta):
-    """
-    Represents a subscription with an event source.
-
-    If used as a context manager, unsubscribes on exit.
-    """
 
     def __enter__(self) -> Subscription:
         return self
@@ -110,10 +101,6 @@ class Subscription(metaclass=ABCMeta):
 
 
 class EventBroker(metaclass=ABCMeta):
-    """
-    Interface for objects that can be used to publish notifications to interested
-    subscribers.
-    """
 
     @abstractmethod
     async def start(self, exit_stack: AsyncExitStack, logger: Logger) -> None:
@@ -157,12 +144,6 @@ class EventBroker(metaclass=ABCMeta):
 
 
 class DataStore(metaclass=ABCMeta):
-    """
-    Interface for data stores.
-
-    Data stores keep track of tasks, schedules and jobs. When these objects change, the
-    data store publishes events to the associated event broker accordingly.
-    """
 
     @abstractmethod
     async def start(

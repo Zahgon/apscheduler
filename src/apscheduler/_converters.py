@@ -10,59 +10,31 @@ from tzlocal import get_localzone
 
 
 def as_int(value: int | str) -> int:
-    if isinstance(value, str):
-        return int(value)
-
-    return value
+    pass
 
 
 def as_datetime(value: datetime | str) -> datetime:
-    if isinstance(value, str):
-        # Before Python 3.11, fromisoformat() could not handle the "Z" suffix
-        if value.upper().endswith("Z"):
-            value = value[:-1] + "+00:00"
-
-        value = datetime.fromisoformat(value)
-
-    return value
+    pass
 
 
 def as_aware_datetime(value: datetime | str) -> datetime:
-    value_as_datetime = as_datetime(value)
-    if isinstance(value_as_datetime, datetime) and value_as_datetime.tzinfo is None:
-        value_as_datetime = value_as_datetime.astimezone(get_localzone())
-
-    return value_as_datetime
+    pass
 
 
 def as_date(value: date | str) -> date:
-    if isinstance(value, str):
-        return date.fromisoformat(value)
-
-    return value
+    pass
 
 
 def as_timezone(value: tzinfo | str) -> tzinfo:
-    if isinstance(value, str):
-        return get_localzone() if value == "local" else ZoneInfo(value)
-    elif value is timezone.utc:
-        return ZoneInfo("UTC")
-
-    return value
+    pass
 
 
 def as_uuid(value: UUID | str) -> UUID:
-    if isinstance(value, str):
-        return UUID(value)
-
-    return value
+    pass
 
 
 def as_timedelta(value: timedelta | int) -> timedelta:
-    if isinstance(value, (float, int)):
-        return timedelta(seconds=value)
-
-    return value
+    pass
 
 
 def as_enum(enum_class: Any) -> Callable[[Any], Any]:
@@ -77,9 +49,6 @@ def as_enum(enum_class: Any) -> Callable[[Any], Any]:
 
 def list_converter(converter: Callable[[Any], Any]) -> Callable[[Any], Any]:
     def convert(value: Any) -> Any:
-        if isinstance(value, list):
-            return [converter(item) for item in value]
-
-        return value
+        pass
 
     return convert

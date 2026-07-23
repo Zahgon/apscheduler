@@ -13,11 +13,6 @@ from ..abc import Trigger
 
 @attrs.define
 class DateTrigger(Trigger):
-    """
-    Triggers once on the given date/time.
-
-    :param run_time: the date/time to run the job at
-    """
 
     run_time: datetime = attrs.field(
         converter=as_aware_datetime, validator=instance_of(datetime)
@@ -25,11 +20,7 @@ class DateTrigger(Trigger):
     _completed: bool = attrs.field(init=False, eq=False, default=False)
 
     def next(self) -> datetime | None:
-        if not self._completed:
-            self._completed = True
-            return self.run_time
-        else:
-            return None
+        pass
 
     def __getstate__(self) -> dict[str, Any]:
         return {

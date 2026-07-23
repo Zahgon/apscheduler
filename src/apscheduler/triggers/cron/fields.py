@@ -1,6 +1,3 @@
-"""
-Fields represent CronTrigger options which map to :class:`~datetime.datetime` fields.
-"""
 
 from __future__ import annotations
 
@@ -72,42 +69,19 @@ class BaseField:
             self.append_expression(expr)
 
     def get_min(self, dateval: datetime) -> int:
-        return MIN_VALUES[self.name]
+        pass
 
     def get_max(self, dateval: datetime) -> int:
-        return MAX_VALUES[self.name]
+        pass
 
     def get_value(self, dateval: datetime) -> int:
-        return getattr(dateval, self.name)
+        pass
 
     def get_next_value(self, dateval: datetime) -> int | None:
-        smallest = None
-        for expr in self.expressions:
-            value = expr.get_next_value(dateval, self)
-            if smallest is None or (value is not None and value < smallest):
-                smallest = value
-
-        return smallest
+        pass
 
     def append_expression(self, expr: str) -> None:
-        for compiler in self.compilers:
-            match = compiler.value_re.match(expr)
-            if match:
-                compiled_expr = compiler(**match.groupdict())
-
-                try:
-                    compiled_expr.validate_range(
-                        self.name, MIN_VALUES[self.name], MAX_VALUES[self.name]
-                    )
-                except ValueError as exc:
-                    raise ValueError(
-                        f"Error validating expression {expr!r}: {exc}"
-                    ) from exc
-
-                self.expressions.append(compiled_expr)
-                return
-
-        raise ValueError(f"Unrecognized expression {expr!r} for field {self.name!r}")
+        pass
 
     def __str__(self) -> str:
         expr_strings = (str(e) for e in self.expressions)
@@ -118,7 +92,7 @@ class WeekField(BaseField, real=False):
     __slots__ = ()
 
     def get_value(self, dateval: datetime) -> int:
-        return dateval.isocalendar()[1]
+        pass
 
 
 class DayOfMonthField(
@@ -127,43 +101,17 @@ class DayOfMonthField(
     __slots__ = ()
 
     def get_max(self, dateval: datetime) -> int:
-        return monthrange(dateval.year, dateval.month)[1]
+        pass
 
 
 class DayOfWeekField(BaseField, real=False, extra_compilers=(WeekdayRangeExpression,)):
     __slots__ = ()
 
     def append_expression(self, expr: str) -> None:
-        # Convert numeric weekday expressions into textual ones
-        match = RangeExpression.value_re.match(expr)
-        if match:
-            groups = match.groups()
-            first = int(groups[0]) - 1
-            first = 6 if first < 0 else first
-            if groups[1]:
-                last = int(groups[1]) - 1
-                last = 6 if last < 0 else last
-            else:
-                last = first
-
-            expr = f"{WEEKDAYS[first]}-{WEEKDAYS[last]}"
-
-        # For expressions like Sun-Tue or Sat-Mon, add two expressions that together
-        # cover the expected weekdays
-        match = WeekdayRangeExpression.value_re.match(expr)
-        if match and match.groups()[1]:
-            groups = match.groups()
-            first_index = get_weekday_index(groups[0])
-            last_index = get_weekday_index(groups[1])
-            if first_index > last_index:
-                super().append_expression(f"{WEEKDAYS[0]}-{groups[1]}")
-                super().append_expression(f"{groups[0]}-{WEEKDAYS[-1]}")
-                return
-
-        super().append_expression(expr)
+        pass
 
     def get_value(self, dateval: datetime) -> int:
-        return dateval.weekday()
+        pass
 
 
 class MonthField(BaseField, extra_compilers=(MonthRangeExpression,)):

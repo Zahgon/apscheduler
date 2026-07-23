@@ -29,7 +29,7 @@ class LocalSubscription(Subscription):
     _source: BaseEventBroker
 
     def unsubscribe(self) -> None:
-        self._source.unsubscribe(self.token)
+        pass
 
 
 @attrs.define(kw_only=True)
@@ -42,9 +42,7 @@ class BaseEventBroker(EventBroker):
     _thread_limiter: CapacityLimiter = attrs.field(init=False)
 
     async def start(self, exit_stack: AsyncExitStack, logger: Logger) -> None:
-        self._logger = logger
-        self._task_group = await exit_stack.enter_async_context(create_task_group())
-        self._thread_limiter = CapacityLimiter(1)
+        pass
 
     def subscribe(
         self,
@@ -54,114 +52,36 @@ class BaseEventBroker(EventBroker):
         is_async: bool = True,
         one_shot: bool = False,
     ) -> Subscription:
-        types = set(event_types) if event_types else None
-        token = object()
-        subscription = LocalSubscription(
-            callback, types, one_shot, is_async, token, self
-        )
-        self._subscriptions[token] = subscription
-        return subscription
+        pass
 
     def unsubscribe(self, token: object) -> None:
-        self._subscriptions.pop(token, None)
+        pass
 
     async def publish_local(self, event: Event) -> None:
-        event_type = type(event)
-        one_shot_tokens: list[object] = []
-        for subscription in self._subscriptions.values():
-            if (
-                subscription.event_types is None
-                or event_type in subscription.event_types
-            ):
-                self._task_group.start_soon(self._deliver_event, subscription, event)
-                if subscription.one_shot:
-                    one_shot_tokens.append(subscription.token)
-
-        for token in one_shot_tokens:
-            self.unsubscribe(token)
+        pass
 
     async def _deliver_event(
         self, subscription: LocalSubscription, event: Event
     ) -> None:
-        try:
-            if subscription.is_async:
-                retval = subscription.callback(event)
-                if iscoroutine(retval):
-                    await retval
-            else:
-                await to_thread.run_sync(
-                    subscription.callback, event, limiter=self._thread_limiter
-                )
-        except Exception:
-            self._logger.exception(
-                "Error delivering %s event", event.__class__.__name__
-            )
+        pass
 
 
 @attrs.define(kw_only=True)
 class BaseExternalEventBroker(BaseEventBroker, RetryMixin):
-    """
-    Base class for event brokers that use an external service.
-
-    :param serializer: the serializer used to (de)serialize events for transport
-    """
 
     serializer: Serializer = attrs.field(factory=JSONSerializer)
 
     def generate_notification(self, event: Event) -> bytes:
-        serialized = self.serializer.serialize(event.marshal())
-        return event.__class__.__name__.encode("ascii") + b" " + serialized
+        pass
 
     def generate_notification_str(self, event: Event) -> str:
-        serialized = self.serializer.serialize(event.marshal())
-        return event.__class__.__name__ + " " + b64encode(serialized).decode("ascii")
+        pass
 
     def _reconstitute_event(self, event_type: str, serialized: bytes) -> Event | None:
-        try:
-            kwargs = self.serializer.deserialize(serialized)
-        except DeserializationError:
-            self._logger.exception(
-                "Failed to deserialize an event of type %s",
-                event_type,
-                extra={"serialized": serialized},
-            )
-            return None
-
-        try:
-            event_class = getattr(_events, event_type)
-        except AttributeError:
-            self._logger.error(
-                "Receive notification for a nonexistent event type: %s",
-                event_type,
-                extra={"serialized": serialized},
-            )
-            return None
-
-        try:
-            return event_class.unmarshal(kwargs)
-        except Exception:
-            self._logger.exception("Error reconstituting event of type %s", event_type)
-            return None
+        pass
 
     def reconstitute_event(self, payload: bytes) -> Event | None:
-        try:
-            event_type_bytes, serialized = payload.split(b" ", 1)
-        except ValueError:
-            self._logger.error(
-                "Received malformatted notification", extra={"payload": payload}
-            )
-            return None
-
-        event_type = event_type_bytes.decode("ascii", errors="replace")
-        return self._reconstitute_event(event_type, serialized)
+        pass
 
     def reconstitute_event_str(self, payload: str) -> Event | None:
-        try:
-            event_type, b64_serialized = payload.split(" ", 1)
-        except ValueError:
-            self._logger.error(
-                "Received malformatted notification", extra={"payload": payload}
-            )
-            return None
-
-        return self._reconstitute_event(event_type, b64decode(b64_serialized))
+        pass
